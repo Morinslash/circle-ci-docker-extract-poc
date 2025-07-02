@@ -42,6 +42,38 @@ jobs:
           paths:
             - static-assets
 
+  publish-gh-pages:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Set up Git user
+          command: |
+            git config --global user.email "${GH_EMAIL:-ci-bot@example.com}"
+            git config --global user.name "${GH_NAME:-CircleCI Bot}"
+      - run:
+          name: Clone gh-pages branch
+          command: |          
+            git clone --branch gh-pages https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git gh-pages || \
+            git clone https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git gh-pages
+      - run:
+          name: Copy static assets
+          command: |
+            rm -rf gh-pages/*
+            cp -r static-assets/* gh-pages/
+            touch gh-pages/.nojekyll
+      - run:
+          name: Commit and push to gh-pages
+          command: |
+            cd gh-pages
+            git add .
+            git commit -m "Deploy to GitHub Pages [skip ci]" || echo "No changes to commit"
+            git push "https://${GH_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" gh-pages
+   
+
 workflows:
   version: 2
   build_and_extract:
@@ -50,5 +82,11 @@ workflows:
       - extract_assets:
           requires:
             - build_image
+      - publish-gh-pages:
+          requires:
+            - extract_assets
+          filters:
+            branches:
+              only: main
 
 
