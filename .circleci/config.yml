@@ -1,0 +1,54 @@
+version: 2.1
+
+jobs:
+  build_image:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: docker build -t my-app:ci .
+      - run:
+          name: Save Docker image as tar
+          command: |
+            mkdir -p images
+            docker save -o images/my-app_ci.tar my-app:ci
+      - persist_to_workspace:
+          root: .
+          paths:
+            - images
+
+  extract_assets:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - attach_workspace:
+          at: .
+      - setup_remote_docker
+      - run:
+          name: Load Docker image from tar
+          command: docker load -i images/my-app_ci.tar
+      - run:
+          name: Create container from image
+          command: docker create --name temp_container my-app:ci
+      - run:
+          name: Copy static assts from container
+          command: |
+            docker cp temp_container:/user/share/nginx/html ./static-assets
+      - persists_to_workspace:
+          root: .
+          paths:
+            - static-assets
+
+workflows:
+  version: 2
+  build_and_extract:
+    jobs:
+      - build_image
+      - extract_assets:
+          requires:
+            - build_image
+
+
