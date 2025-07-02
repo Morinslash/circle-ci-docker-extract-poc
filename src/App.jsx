@@ -4,7 +4,7 @@ function App() {
   const [value, setValue] = useState('');
 
   useEffect(() => {
-    fetch('/config.json')
+    fetch(`${import.meta.env.BASE_URL}config.json`)
       .then((response) => response.json())
       .then((data) => setValue(data.value));
   }, []);
