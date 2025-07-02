@@ -55,20 +55,21 @@ jobs:
             git config --global user.email "${GH_EMAIL:-ci-bot@example.com}"
             git config --global user.name "${GH_NAME:-CircleCI Bot}"
       - run:
-          name: Clone gh-pages branch
+          name: Clone gh-pages branch or create orphan
           command: |
             git clone https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git gh-pages
             cd gh-pages
             git checkout gh-pages || git checkout --orphan gh-pages
+            git rm -rf . || true
       - run:
           name: Copy static assets
           command: |
-            rm -rf gh-pages/*
             cp -r static-assets/* gh-pages/
             touch gh-pages/.nojekyll
       - run:
           name: Commit and push to gh-pages
           command: |
+            cd gh-pages
             git add .
             git commit -m "Deploy to GitHub Pages [skip ci]" || echo "No changes to commit"
             git push "https://${GH_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" gh-pages
