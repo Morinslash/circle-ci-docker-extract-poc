@@ -56,9 +56,10 @@ jobs:
             git config --global user.name "${GH_NAME:-CircleCI Bot}"
       - run:
           name: Clone gh-pages branch
-          command: |          
-            git clone --branch gh-pages https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git gh-pages || \
+          command: |
             git clone https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git gh-pages
+            cd gh-pages
+            git checkout gh-pages || git checkout --orphan gh-pages
       - run:
           name: Copy static assets
           command: |
@@ -68,7 +69,6 @@ jobs:
       - run:
           name: Commit and push to gh-pages
           command: |
-            cd gh-pages
             git add .
             git commit -m "Deploy to GitHub Pages [skip ci]" || echo "No changes to commit"
             git push "https://${GH_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" gh-pages
