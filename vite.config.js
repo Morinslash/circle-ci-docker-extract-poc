@@ -3,6 +3,6 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/cicle-ci-docker-extract-poc/',
+  base: '/circle-ci-docker-extract-poc/',
   plugins: [react()],
 })
