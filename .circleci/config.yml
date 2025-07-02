@@ -36,7 +36,7 @@ jobs:
       - run:
           name: Copy static assts from container
           command: |
-            docker cp temp_container:/user/share/nginx/html ./static-assets
+            docker cp temp_container:/usr/share/nginx/html ./static-assets
       - persist_to_workspace:
           root: .
           paths:
