@@ -80,7 +80,7 @@ jobs:
 
   upload-to-s3:
     docker:
-      - image: cimg/aws:stable
+      - image: cimg/aws:2024.03
     steps:
       - attach_workspace:
          at: .
