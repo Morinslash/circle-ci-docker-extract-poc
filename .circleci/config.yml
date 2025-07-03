@@ -77,6 +77,26 @@ jobs:
             git add .
             git commit -m "Deploy to GitHub Pages [skip ci]" || echo "No changes to commit"
             git push "https://${GH_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" gh-pages
+
+  upload-to-s3:
+    docker:
+      - image: cimg/aws:2024.06
+    steps:
+      - attach_workspace:
+         at: .
+      - run:
+          name: Copy static assets for S3 deployment 
+          command: |
+            cp -r static-assets s3-assets
+      - run:
+          name: Set config.json for S3 deployment
+          command: |
+            echo "{\"env\": \"s3-page\", \"release\": \"${CIRCLE_SHA1}\"}" > s3-assets/config.json
+      - run:
+          name: Upload static assets to S3
+          command: |
+            aws s3 sync s3-assets/ s3://sk-cicd-poc-1/ --delete
+
    
 
 workflows:
@@ -88,6 +108,12 @@ workflows:
           requires:
             - build_image
       - publish-gh-pages:
+          requires:
+            - extract_assets
+          filters:
+            branches:
+              only: main
+      - upload-to-s3:
           requires:
             - extract_assets
           filters:
