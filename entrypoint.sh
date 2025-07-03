@@ -3,7 +3,7 @@
 # Create config.json dynamically
 cat <<EOF > /usr/share/nginx/html/config.json
 {
-  "value": "Container"
+  "env": "Container"
 }
 EOF
 

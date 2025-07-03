@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 
 function App() {
-  const [value, setValue] = useState('');
+  const [config, setConfig] = useState({ env: '', release: ''});
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}config.json`)
       .then((response) => response.json())
-      .then((data) => setValue(data.value));
+      .then((data) => setConfig(data));
   }, []);
 
   return (
     <div>
-      Hello World from the {value}!
+      Hello World from the {config.env}!
+      Release: {config.release ? config.release : 'local build'}
     </div>
   );
 }

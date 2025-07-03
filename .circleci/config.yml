@@ -69,7 +69,7 @@ jobs:
       - run:
           name: Overwrite config.json for GitHub Pages
           command: |
-            echo '{"value": "GitHub Pages"}' > gh-pages/config.json
+            echo "{\"env\": \"gh-pages\", \"release\": \"${CIRCLE_SHA1}\"}" > gh-pages/config.json
       - run:
           name: Commit and push to gh-pages
           command: |
