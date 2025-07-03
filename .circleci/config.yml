@@ -67,6 +67,10 @@ jobs:
             cp -r static-assets/* gh-pages/
             touch gh-pages/.nojekyll
       - run:
+          name: Overwrite config.json for GitHub Pages
+          command: |
+            echo '{"value": "GitHub Pages"}' > static-assets/config.json
+      - run:
           name: Commit and push to gh-pages
           command: |
             cd gh-pages
